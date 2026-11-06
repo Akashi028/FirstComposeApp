@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -66,7 +67,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 
         Box(
             modifier = Modifier
-                .background(Color.Red)
+                .background(MaterialTheme.colorScheme.primary)
                 .width(200.dp)
                 .height(200.dp)
         ) {
@@ -83,66 +84,67 @@ data class NavItem(
 fun NavBar(modifier: Modifier = Modifier){
     val formaBarra = RoundedCornerShape(50)
     val elementiNavBar = listOf(
-        NavItem("Titolo1", icon = ImageVector.vectorResource(id = R.drawable.ic_custom_home)),
-        NavItem("Titolo2", icon = ImageVector.vectorResource(id = R.drawable.ic_custom_home)),
-        NavItem("Titolo3", icon = ImageVector.vectorResource(id = R.drawable.ic_custom_home))
+        NavItem("Calendario", icon = ImageVector.vectorResource(id = R.drawable.ic_custom_home)),
+        NavItem("To-Do List", icon = ImageVector.vectorResource(id = R.drawable.ic_custom_home))
     )
+    val dimensioneNavBar = (elementiNavBar.size * 100).dp;
 
-
-    Row(
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .navigationBarsPadding()
-            .height(75.dp)
-            .clip(formaBarra)
-            .background(color = Color.Red)
-            .padding(2.dp),
-//            .border(
-//                width = 2.dp,
-//                color = Color.Blue,
-//                shape = formaBarra
-//            ),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly
-
+            .navigationBarsPadding(),
+        contentAlignment = Alignment.Center
     ){
-        elementiNavBar.forEach { el ->
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .clip(shape = formaBarra)
-                    .background(color = Color(0xFdddee66)),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Bottom
-                //contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = el.icon,
-                    contentDescription = el.title,
+        Row(
+            modifier = Modifier
+                .width(dimensioneNavBar)
+                .height(75.dp)
+                .clip(formaBarra)
+                .background(color = MaterialTheme.colorScheme.tertiary)
+                .padding(2.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
+
+        ){
+            elementiNavBar.forEach { el ->
+                Column(
                     modifier = Modifier
-                        .size(40.dp)
-                )
-                //Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = el.title,
-                    color = Color.Black,
-                    fontSize = 11.sp,
-                    modifier = Modifier
-                        //.align(alignment = Alignment.BottomCenter)
-                        .padding(4.dp),
-                    style = TextStyle(
-                        platformStyle = PlatformTextStyle(
-                            includeFontPadding = false
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clip(shape = formaBarra)
+                        .background(color = MaterialTheme.colorScheme.primary),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Bottom
+                    //contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = el.icon,
+                        contentDescription = el.title,
+                        modifier = Modifier
+                            .size(40.dp)
+                    )
+                    //Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = el.title,
+                        color = Color.Black,
+                        fontSize = 11.sp,
+                        modifier = Modifier
+                            //.align(alignment = Alignment.BottomCenter)
+                            .padding(4.dp),
+                        style = TextStyle(
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false
+                            )
                         )
                     )
-                )
+                }
             }
         }
     }
 }
 
 @Preview(showBackground = true)
+//@PreviewScreenSizes
 @Composable
 fun MainScreen() {
     FirstComposeAppTheme {
@@ -150,10 +152,7 @@ fun MainScreen() {
             modifier = Modifier
                 .fillMaxSize(),
             bottomBar = {
-                NavBar(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp),
-                )
+                NavBar()
             }
         ) { innerPadding ->
             Greeting(

@@ -13,20 +13,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.background
 
+val Onyx = Color(0xFF0c1214)
+val CharcoalBlue = Color(0xFF2F4550)
+val BlueSlate = Color(0xFF97B0C4)
+val LightBlue = Color(0xFFb8dbd9)
+val GhostWhite = Color(0xFFf4f4f9)
+
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
-    background = Color(0xFF1C1B1F), // <-- Aggiunto
-    surface = Color(0xFF1C1B1F)       // <-- Aggiunto
+    primary = GhostWhite,
+    secondary = LightBlue,
+    tertiary = BlueSlate
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
-    background = Color(0xFFFFFBFE), // <-- Scommentato
-    surface = Color(0xFFFFFBFE)
+    primary = BlueSlate,
+    secondary = CharcoalBlue,
+    tertiary = LightBlue,
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -43,7 +45,7 @@ private val LightColorScheme = lightColorScheme(
 fun FirstComposeAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
