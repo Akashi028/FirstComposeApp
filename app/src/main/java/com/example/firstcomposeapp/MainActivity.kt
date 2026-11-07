@@ -22,16 +22,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.firstcomposeapp.ui.theme.FirstComposeAppTheme
 import androidx.compose.material3.*
 import androidx.compose.material3.Icon
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHost
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.firstcomposeapp.pagine.Greeting
+import com.example.firstcomposeapp.pagine.PaginaToDo
 
 
 class MainActivity : ComponentActivity() {
@@ -44,50 +54,23 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Hello $name!"
-            )
-            Button(onClick = { /* Azione del bottone */ }) {
-                Text(text = "Cliccami")
-            }
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Box(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primary)
-                .width(200.dp)
-                .height(200.dp)
-        ) {
-            // Eventuale contenuto del box
-        }
-    }
-}
 
 data class NavItem(
     val title: String,
-    val icon: ImageVector
+    val icon: ImageVector,
+    val route: String,
 )
 @Composable
-fun NavBar(modifier: Modifier = Modifier){
+fun NavBar(modifier: Modifier = Modifier, navController: NavController){
     val formaBarra = RoundedCornerShape(50)
     val elementiNavBar = listOf(
-        NavItem("Calendario", icon = ImageVector.vectorResource(id = R.drawable.ic_custom_home)),
-        NavItem("To-Do List", icon = ImageVector.vectorResource(id = R.drawable.ic_custom_home))
+        NavItem("Calendario", icon = ImageVector.vectorResource(id = R.drawable.ic_custom_home), route = "calendario"),
+        NavItem("To-Do List", icon = ImageVector.vectorResource(id = R.drawable.ic_custom_home), route = "ToDo")
     )
     val dimensioneNavBar = (elementiNavBar.size * 100).dp;
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
     Box(
         modifier = modifier
@@ -112,10 +95,17 @@ fun NavBar(modifier: Modifier = Modifier){
                         .weight(1f)
                         .fillMaxHeight()
                         .clip(shape = formaBarra)
-                        .background(color = MaterialTheme.colorScheme.primary),
+                        .background(
+                            color = if(currentRoute==el.route){
+                                        MaterialTheme.colorScheme.primary
+                                    }else{
+                                        Color.Transparent
+                                    })
+                        .clickable{
+                            navController.navigate(el.route)
+                        },
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Bottom
-                    //contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = el.icon,
@@ -143,22 +133,53 @@ fun NavBar(modifier: Modifier = Modifier){
     }
 }
 
+@Composable
+fun AddEventButton(){
+    FloatingActionButton(
+        modifier = Modifier
+            .size(50.dp)
+            .clip(RoundedCornerShape(50)),
+        onClick = {},
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
+    ) {
+        Icon(
+            imageVector = ImageVector.vectorResource(id = R.drawable.add_button),
+            contentDescription = "Aggiungi evento",
+            Modifier.size(50.dp)
+        )
+    }
+}
+
 @Preview(showBackground = true)
 //@PreviewScreenSizes
 @Composable
 fun MainScreen() {
     FirstComposeAppTheme {
+        val navController = rememberNavController();
         Scaffold(
             modifier = Modifier
                 .fillMaxSize(),
             bottomBar = {
-                NavBar()
-            }
+                NavBar(navController = navController)
+            },
+            floatingActionButton = {
+                AddEventButton()
+            },
+            floatingActionButtonPosition = FabPosition.Center
         ) { innerPadding ->
-            Greeting(
-                name = "Android",
+            NavHost(
+                navController = navController,
+                startDestination = "calendario",
                 modifier = Modifier.padding(innerPadding)
-            )
+            ){
+                composable("calendario"){
+                    Greeting(name = "Ripensiamoci")
+                }
+                composable("ToDo"){
+                    PaginaToDo()
+                }
+            }
         }
     }
 }
