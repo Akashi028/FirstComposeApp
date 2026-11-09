@@ -13,11 +13,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.background
 
-val Onyx = Color(0xFF0c1214)
-val CharcoalBlue = Color(0xFF2F4550)
-val BlueSlate = Color(0xFF97B0C4)
-val LightBlue = Color(0xFFb8dbd9)
-val GhostWhite = Color(0xFFf4f4f9)
+val Nero = Color(0xFF000000)
+val CharcoalBlue = Color(0x80000000)
+val BlueSlate = Color(0x40000000)
+val LightBlue = Color(0x10000000)
+val GhostWhite = Color(0x20000000)
 
 private val DarkColorScheme = darkColorScheme(
     primary = GhostWhite,

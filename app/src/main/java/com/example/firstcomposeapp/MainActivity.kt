@@ -1,5 +1,6 @@
 package com.example.firstcomposeapp
 
+import android.app.Dialog
 import android.icu.text.CaseMap
 import android.os.Bundle
 import android.widget.Button
@@ -23,6 +24,10 @@ import com.example.firstcomposeapp.ui.theme.FirstComposeAppTheme
 import androidx.compose.material3.*
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -34,14 +39,21 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.firstcomposeapp.pagine.Greeting
+import com.example.firstcomposeapp.pagine.PopupCreaEvento
+import com.example.firstcomposeapp.pagine.PaginaCalendario
 import com.example.firstcomposeapp.pagine.PaginaToDo
+import com.example.firstcomposeapp.pagine.PopupCreaTodo
+import com.example.firstcomposeapp.pagine.Promemoria
+import com.example.firstcomposeapp.pagine.ToDoElementi
+import org.w3c.dom.Text
 
 
 class MainActivity : ComponentActivity() {
@@ -134,29 +146,50 @@ fun NavBar(modifier: Modifier = Modifier, navController: NavController){
 }
 
 @Composable
-fun AddEventButton(){
+fun AddEventButton(navController: NavController, viewModel: ToDoElementi = viewModel()){
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    var showPopup by remember { mutableStateOf(false) }
+
     FloatingActionButton(
         modifier = Modifier
             .size(50.dp)
             .clip(RoundedCornerShape(50)),
-        onClick = {},
-        containerColor = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onPrimary,
+        onClick = {showPopup = true},
     ) {
         Icon(
             imageVector = ImageVector.vectorResource(id = R.drawable.add_button),
             contentDescription = "Aggiungi evento",
-            Modifier.size(50.dp)
+            Modifier.size(40.dp)
         )
     }
-}
 
+    if(showPopup){
+        Dialog(onDismissRequest = {showPopup=false}){
+            if(currentRoute == "calendario"){
+                PopupCreaEvento(
+                    onDismiss = { showPopup = false }
+                )
+            }
+            if(currentRoute == "ToDo"){
+                PopupCreaTodo(
+                    onDismiss = { showPopup = false },
+                    onSave = { testoInserito ->
+                        viewModel.aggiungiPromemoria(testoInserito)
+                        showPopup = false
+                    }
+                )
+            }
+        }
+    }
+}
 @Preview(showBackground = true)
 //@PreviewScreenSizes
 @Composable
 fun MainScreen() {
     FirstComposeAppTheme {
-        val navController = rememberNavController();
+        val navController = rememberNavController()
+        val sharedViewModel: ToDoElementi = viewModel()
         Scaffold(
             modifier = Modifier
                 .fillMaxSize(),
@@ -164,7 +197,7 @@ fun MainScreen() {
                 NavBar(navController = navController)
             },
             floatingActionButton = {
-                AddEventButton()
+                AddEventButton(navController, viewModel = sharedViewModel)
             },
             floatingActionButtonPosition = FabPosition.Center
         ) { innerPadding ->
@@ -174,10 +207,10 @@ fun MainScreen() {
                 modifier = Modifier.padding(innerPadding)
             ){
                 composable("calendario"){
-                    Greeting(name = "Ripensiamoci")
+                    PaginaCalendario(name = "Strano")
                 }
                 composable("ToDo"){
-                    PaginaToDo()
+                    PaginaToDo(viewModel = sharedViewModel)
                 }
             }
         }
