@@ -1,5 +1,6 @@
 package com.example.firstcomposeapp
 
+import android.app.Activity
 import android.app.Dialog
 import android.icu.text.CaseMap
 import android.os.Bundle
@@ -23,16 +24,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.firstcomposeapp.ui.theme.FirstComposeAppTheme
 import androidx.compose.material3.*
 import androidx.compose.material3.Icon
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -40,6 +43,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHost
@@ -54,6 +58,7 @@ import com.example.firstcomposeapp.pagine.PopupCreaTodo
 import com.example.firstcomposeapp.pagine.Promemoria
 import com.example.firstcomposeapp.pagine.ToDoElementi
 import org.w3c.dom.Text
+import java.time.LocalDate
 
 
 class MainActivity : ComponentActivity() {
@@ -77,8 +82,8 @@ data class NavItem(
 fun NavBar(modifier: Modifier = Modifier, navController: NavController){
     val formaBarra = RoundedCornerShape(50)
     val elementiNavBar = listOf(
-        NavItem("Calendario", icon = ImageVector.vectorResource(id = R.drawable.ic_custom_home), route = "calendario"),
-        NavItem("To-Do List", icon = ImageVector.vectorResource(id = R.drawable.ic_custom_home), route = "ToDo")
+        NavItem("Calendario", icon = ImageVector.vectorResource(id = R.drawable.calendario), route = "calendario"),
+        NavItem("To-Do List", icon = ImageVector.vectorResource(id = R.drawable.todos), route = "ToDo")
     )
     val dimensioneNavBar = (elementiNavBar.size * 100).dp;
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -146,7 +151,7 @@ fun NavBar(modifier: Modifier = Modifier, navController: NavController){
 }
 
 @Composable
-fun AddEventButton(navController: NavController, viewModel: ToDoElementi = viewModel()){
+fun AddEventButton(navController: NavController, viewModel: ToDoElementi){
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     var showPopup by remember { mutableStateOf(false) }
@@ -156,6 +161,7 @@ fun AddEventButton(navController: NavController, viewModel: ToDoElementi = viewM
             .size(50.dp)
             .clip(RoundedCornerShape(50)),
         onClick = {showPopup = true},
+        containerColor = Color(0xFFbbbbbb)
     ) {
         Icon(
             imageVector = ImageVector.vectorResource(id = R.drawable.add_button),
@@ -174,9 +180,9 @@ fun AddEventButton(navController: NavController, viewModel: ToDoElementi = viewM
             if(currentRoute == "ToDo"){
                 PopupCreaTodo(
                     onDismiss = { showPopup = false },
-                    onSave = { testoInserito ->
-                        viewModel.aggiungiPromemoria(testoInserito)
-                        showPopup = false
+                    onSave = { titolo, data, descrizione, importanza ->
+                        viewModel.aggiungiPromemoria(titolo, data, descrizione, importanza)
+                        navController.navigate("ToDo")
                     }
                 )
             }
@@ -193,6 +199,7 @@ fun MainScreen() {
         Scaffold(
             modifier = Modifier
                 .fillMaxSize(),
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
             bottomBar = {
                 NavBar(navController = navController)
             },

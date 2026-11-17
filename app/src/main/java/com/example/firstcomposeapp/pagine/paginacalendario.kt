@@ -63,7 +63,6 @@ fun PopupCreaEvento(onDismiss: () -> Unit) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Qui metti i tuoi TextField, bottoni o qualsiasi cosa ti serva
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
